@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useSurvey } from '@/contexts/SurveyContext';
@@ -13,12 +13,16 @@ const VisualQuestionsPage = () => {
   const navigate = useNavigate();
   const { userData } = useSurvey();
   const { toast } = useToast();
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   
   // Filter visual questions (1-10)
   const visualQuestions = questions.filter(q => q.category === 'visual');
   
-  // Check if all questions have been answered
-  const allAnswered = visualQuestions.every(q => userData.answers[q.id] !== undefined);
+  // Current question
+  const currentQuestion = visualQuestions[currentQuestionIndex];
+  
+  // Progress within this section
+  const visualProgress = ((currentQuestionIndex + 1) / visualQuestions.length);
   
   useEffect(() => {
     // If user hasn't entered name and NIM, redirect to welcome page
@@ -28,34 +32,49 @@ const VisualQuestionsPage = () => {
   }, [userData, navigate]);
   
   const handleNext = () => {
-    if (!allAnswered) {
+    // Check if current question is answered
+    if (userData.answers[currentQuestion.id] === undefined) {
       toast({
-        title: "Mohon jawab semua pertanyaan",
-        description: "Silakan jawab semua pertanyaan sebelum melanjutkan.",
+        title: "Mohon jawab pertanyaan",
+        description: "Silakan jawab pertanyaan sebelum melanjutkan.",
         variant: "destructive",
       });
       return;
     }
     
-    navigate('/survey/auditory');
+    if (currentQuestionIndex < visualQuestions.length - 1) {
+      // Go to next question
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      // All questions in this section are answered, proceed to next section
+      navigate('/survey/auditory');
+    }
+  };
+  
+  const handleBack = () => {
+    if (currentQuestionIndex > 0) {
+      // Go back to previous question
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    } else {
+      // Return to welcome page if on first question
+      navigate('/');
+    }
   };
   
   return (
     <SurveyLayout 
       title="Pertanyaan Visual"
-      subtitle="Bagian 1 dari 3: Pertanyaan tentang gaya belajar visual"
+      subtitle={`Pertanyaan ${currentQuestionIndex + 1} dari ${visualQuestions.length}`}
     >
       <ProgressBar currentPage={1} totalPages={3} />
       
       <div className="space-y-6">
-        {visualQuestions.map((question) => (
-          <QuestionCard key={question.id} question={question} />
-        ))}
+        <QuestionCard key={currentQuestion.id} question={currentQuestion} />
 
         <div className="flex justify-between mt-8">
           <Button 
             variant="outline" 
-            onClick={() => navigate('/')}
+            onClick={handleBack}
           >
             Kembali
           </Button>
@@ -63,7 +82,7 @@ const VisualQuestionsPage = () => {
             onClick={handleNext}
             className="bg-vark-visual hover:bg-indigo-600"
           >
-            Selanjutnya
+            {currentQuestionIndex < visualQuestions.length - 1 ? 'Selanjutnya' : 'Bagian Berikutnya'}
           </Button>
         </div>
       </div>

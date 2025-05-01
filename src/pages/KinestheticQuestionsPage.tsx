@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useSurvey } from '@/contexts/SurveyContext';
@@ -13,12 +13,13 @@ const KinestheticQuestionsPage = () => {
   const navigate = useNavigate();
   const { userData, calculateResults } = useSurvey();
   const { toast } = useToast();
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   
   // Filter kinesthetic questions (21-30)
   const kinestheticQuestions = questions.filter(q => q.category === 'kinesthetic');
   
-  // Check if all questions have been answered
-  const allAnswered = kinestheticQuestions.every(q => userData.answers[q.id] !== undefined);
+  // Current question
+  const currentQuestion = kinestheticQuestions[currentQuestionIndex];
   
   useEffect(() => {
     // Ensure user has completed the auditory questions section first
@@ -31,10 +32,11 @@ const KinestheticQuestionsPage = () => {
   }, [userData, navigate]);
   
   const handleFinish = () => {
-    if (!allAnswered) {
+    // Check if current question is answered
+    if (userData.answers[currentQuestion.id] === undefined) {
       toast({
-        title: "Mohon jawab semua pertanyaan",
-        description: "Silakan jawab semua pertanyaan sebelum melanjutkan.",
+        title: "Mohon jawab pertanyaan",
+        description: "Silakan jawab pertanyaan sebelum melanjutkan.",
         variant: "destructive",
       });
       return;
@@ -44,21 +46,46 @@ const KinestheticQuestionsPage = () => {
     navigate('/results');
   };
   
+  const handleNext = () => {
+    // Check if current question is answered
+    if (userData.answers[currentQuestion.id] === undefined) {
+      toast({
+        title: "Mohon jawab pertanyaan",
+        description: "Silakan jawab pertanyaan sebelum melanjutkan.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (currentQuestionIndex < kinestheticQuestions.length - 1) {
+      // Go to next question
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      // All questions in this section are answered, calculate results and go to results page
+      calculateResults();
+      navigate('/results');
+    }
+  };
+  
   const handleBack = () => {
-    navigate('/survey/auditory');
+    if (currentQuestionIndex > 0) {
+      // Go back to previous question
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    } else {
+      // Return to auditory section if on first question
+      navigate('/survey/auditory');
+    }
   };
   
   return (
     <SurveyLayout 
-      title="Pertanyaan Kinestetik" 
-      subtitle="Bagian 3 dari 3: Pertanyaan tentang gaya belajar kinestetik"
+      title="Pertanyaan Kinestetik"
+      subtitle={`Pertanyaan ${currentQuestionIndex + 1} dari ${kinestheticQuestions.length}`}
     >
       <ProgressBar currentPage={3} totalPages={3} />
       
       <div className="space-y-6">
-        {kinestheticQuestions.map((question) => (
-          <QuestionCard key={question.id} question={question} />
-        ))}
+        <QuestionCard key={currentQuestion.id} question={currentQuestion} />
 
         <div className="flex justify-between mt-8">
           <Button 
@@ -68,10 +95,10 @@ const KinestheticQuestionsPage = () => {
             Kembali
           </Button>
           <Button 
-            onClick={handleFinish}
+            onClick={handleNext}
             className="bg-vark-kinesthetic hover:bg-pink-600"
           >
-            Selesai
+            {currentQuestionIndex < kinestheticQuestions.length - 1 ? 'Selanjutnya' : 'Selesai'}
           </Button>
         </div>
       </div>
