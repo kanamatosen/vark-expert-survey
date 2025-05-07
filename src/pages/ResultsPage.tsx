@@ -23,7 +23,8 @@ const ResultsPage = () => {
     }
     
     // Add current survey to history once when results are viewed
-    if (!historyAddedRef.current) {
+    // Only if this is a new survey (not viewing history)
+    if (!historyAddedRef.current && !userData.timestamp) {
       addToHistory();
       historyAddedRef.current = true;
     }

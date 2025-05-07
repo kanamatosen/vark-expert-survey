@@ -12,7 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/components/ui/use-toast';
 
 const HistoryPage = () => {
-  const { surveyHistory, clearHistory } = useSurvey();
+  const { surveyHistory, clearHistory, viewHistoryItem } = useSurvey();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -26,6 +26,11 @@ const HistoryPage = () => {
       title: "Riwayat dihapus",
       description: "Semua data riwayat tes telah dihapus.",
     });
+  };
+  
+  const handleViewDetail = (index: number) => {
+    viewHistoryItem(index);
+    navigate('/results');
   };
 
   // Helper function to format learning style name
@@ -108,8 +113,7 @@ const HistoryPage = () => {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => navigate('/results')}
-                          disabled={!entry.results}
+                          onClick={() => handleViewDetail(index)}
                         >
                           Detail
                         </Button>

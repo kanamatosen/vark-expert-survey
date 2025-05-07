@@ -13,6 +13,7 @@ interface SurveyContextType {
   surveyHistory: UserData[];
   addToHistory: () => void;
   clearHistory: () => void;
+  viewHistoryItem: (index: number) => void;
 }
 
 const defaultUserData: UserData = {
@@ -91,6 +92,14 @@ export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const clearHistory = () => {
     setSurveyHistory([]);
   };
+  
+  // New function to view a specific history item
+  const viewHistoryItem = (index: number) => {
+    if (index >= 0 && index < surveyHistory.length) {
+      const historyItem = surveyHistory[index];
+      setUserData(historyItem);
+    }
+  };
 
   return (
     <SurveyContext.Provider 
@@ -103,7 +112,8 @@ export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         resetSurvey,
         surveyHistory,
         addToHistory,
-        clearHistory
+        clearHistory,
+        viewHistoryItem
       }}
     >
       {children}
