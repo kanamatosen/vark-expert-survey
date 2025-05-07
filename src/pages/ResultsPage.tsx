@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ const ResultsPage = () => {
   const { userData, resetSurvey, addToHistory } = useSurvey();
   const navigate = useNavigate();
   const printRef = useRef<HTMLDivElement>(null);
+  const historyAddedRef = useRef(false);
   
   useEffect(() => {
     // If results aren't calculated yet, redirect to the welcome page
@@ -20,8 +22,11 @@ const ResultsPage = () => {
       return;
     }
     
-    // Add current survey to history once results are viewed
-    addToHistory();
+    // Add current survey to history once when results are viewed
+    if (!historyAddedRef.current) {
+      addToHistory();
+      historyAddedRef.current = true;
+    }
   }, [userData, navigate, addToHistory]);
   
   const handleRestart = () => {

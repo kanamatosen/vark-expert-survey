@@ -68,13 +68,23 @@ export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const addToHistory = () => {
     // Only add to history if we have results and it's not empty
     if (userData.results && userData.dominantStyle) {
-      // Add timestamp to the survey result
-      const surveyWithTimestamp = {
-        ...userData,
-        timestamp: new Date().toISOString()
-      };
+      // Check if this entry is already in history based on timestamp
+      const existingEntry = surveyHistory.find(entry => 
+        entry.name === userData.name && 
+        entry.nim === userData.nim &&
+        entry.timestamp && 
+        (new Date().getTime() - new Date(entry.timestamp).getTime() < 5000) // Within 5 seconds
+      );
       
-      setSurveyHistory(prev => [surveyWithTimestamp, ...prev]);
+      if (!existingEntry) {
+        // Add timestamp to the survey result
+        const surveyWithTimestamp = {
+          ...userData,
+          timestamp: new Date().toISOString()
+        };
+        
+        setSurveyHistory(prev => [surveyWithTimestamp, ...prev]);
+      }
     }
   };
 
