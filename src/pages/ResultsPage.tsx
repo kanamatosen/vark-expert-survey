@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,10 +6,10 @@ import SurveyLayout from '@/components/SurveyLayout';
 import ResultsChart from '@/components/ResultsChart';
 import { getLearningStyleDescription, getLearningStyleStrengths, getLearningStyleRecommendations } from '@/utils/expertSystem';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Printer } from 'lucide-react';
+import { Printer, History } from 'lucide-react';
 
 const ResultsPage = () => {
-  const { userData, resetSurvey } = useSurvey();
+  const { userData, resetSurvey, addToHistory } = useSurvey();
   const navigate = useNavigate();
   const printRef = useRef<HTMLDivElement>(null);
   
@@ -18,12 +17,20 @@ const ResultsPage = () => {
     // If results aren't calculated yet, redirect to the welcome page
     if (!userData.results || !userData.dominantStyle) {
       navigate('/');
+      return;
     }
-  }, [userData, navigate]);
+    
+    // Add current survey to history once results are viewed
+    addToHistory();
+  }, [userData, navigate, addToHistory]);
   
   const handleRestart = () => {
     resetSurvey();
     navigate('/');
+  };
+
+  const handleViewHistory = () => {
+    navigate('/history');
   };
   
   const handlePrint = () => {
@@ -214,6 +221,13 @@ const ResultsPage = () => {
           >
             <Printer className="mr-2 h-4 w-4" />
             Cetak Hasil
+          </Button>
+          <Button 
+            onClick={handleViewHistory}
+            className="px-8 bg-gray-600 hover:bg-gray-700"
+          >
+            <History className="mr-2 h-4 w-4" />
+            Lihat Riwayat
           </Button>
         </div>
       </div>

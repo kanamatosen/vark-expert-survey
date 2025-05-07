@@ -13,4 +13,5 @@ export interface UserData {
   answers: Record<number, boolean>;
   results?: Record<LearningStyle, number>;
   dominantStyle?: LearningStyle;
+  timestamp?: string;
 }

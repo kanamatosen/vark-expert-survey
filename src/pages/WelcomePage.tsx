@@ -7,9 +7,10 @@ import { Label } from '@/components/ui/label';
 import { useSurvey } from '@/contexts/SurveyContext';
 import SurveyLayout from '@/components/SurveyLayout';
 import { useToast } from "@/components/ui/use-toast";
+import { History } from 'lucide-react';
 
 const WelcomePage = () => {
-  const { userData, setName, setNim } = useSurvey();
+  const { userData, setName, setNim, surveyHistory } = useSurvey();
   const [localName, setLocalName] = useState(userData.name);
   const [localNim, setLocalNim] = useState(userData.nim);
   const navigate = useNavigate();
@@ -39,6 +40,10 @@ const WelcomePage = () => {
     setName(localName);
     setNim(localNim);
     navigate('/survey/visual');
+  };
+
+  const handleHistory = () => {
+    navigate('/history');
   };
 
   return (
@@ -84,6 +89,18 @@ const WelcomePage = () => {
           <Button type="submit" className="w-full h-12 bg-vark-visual hover:bg-indigo-600">
             Mulai Survei
           </Button>
+          
+          {surveyHistory.length > 0 && (
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={handleHistory}
+              className="w-full mt-2"
+            >
+              <History className="mr-2 h-4 w-4" />
+              Lihat Riwayat Tes ({surveyHistory.length})
+            </Button>
+          )}
         </form>
       </div>
     </SurveyLayout>

@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { UserData } from '../types/survey';
 import { evaluateResults } from '../utils/expertSystem';
 
@@ -10,6 +10,9 @@ interface SurveyContextType {
   setAnswer: (questionId: number, isYes: boolean) => void;
   calculateResults: () => void;
   resetSurvey: () => void;
+  surveyHistory: UserData[];
+  addToHistory: () => void;
+  clearHistory: () => void;
 }
 
 const defaultUserData: UserData = {
@@ -18,10 +21,22 @@ const defaultUserData: UserData = {
   answers: {},
 };
 
+// Function to load history from localStorage
+const loadHistory = (): UserData[] => {
+  const savedHistory = localStorage.getItem('vark-survey-history');
+  return savedHistory ? JSON.parse(savedHistory) : [];
+};
+
 const SurveyContext = createContext<SurveyContextType | undefined>(undefined);
 
 export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [userData, setUserData] = useState<UserData>(defaultUserData);
+  const [surveyHistory, setSurveyHistory] = useState<UserData[]>(loadHistory);
+
+  // Save history to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('vark-survey-history', JSON.stringify(surveyHistory));
+  }, [surveyHistory]);
 
   const setName = (name: string) => {
     setUserData(prev => ({ ...prev, name }));
@@ -50,6 +65,23 @@ export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setUserData(defaultUserData);
   };
 
+  const addToHistory = () => {
+    // Only add to history if we have results and it's not empty
+    if (userData.results && userData.dominantStyle) {
+      // Add timestamp to the survey result
+      const surveyWithTimestamp = {
+        ...userData,
+        timestamp: new Date().toISOString()
+      };
+      
+      setSurveyHistory(prev => [surveyWithTimestamp, ...prev]);
+    }
+  };
+
+  const clearHistory = () => {
+    setSurveyHistory([]);
+  };
+
   return (
     <SurveyContext.Provider 
       value={{ 
@@ -58,7 +90,10 @@ export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         setNim, 
         setAnswer,
         calculateResults,
-        resetSurvey
+        resetSurvey,
+        surveyHistory,
+        addToHistory,
+        clearHistory
       }}
     >
       {children}
