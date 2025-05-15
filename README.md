@@ -1,3 +1,17 @@
+
+# VARK Learning Style Assessment
+
+A web application that helps users identify their preferred learning style through an interactive survey based on the VARK (Visual, Auditory, Reading/Writing, Kinesthetic) model.
+
+## Features
+
+- Interactive VARK style assessment
+- Detailed results with personalized recommendations
+- Survey history tracking
+- Responsive design for all devices
+
+## Development
+
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
@@ -12,21 +26,31 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Deployment
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Building for Production
 
-**Use GitHub Codespaces**
+To build the application for production deployment:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```sh
+npm run build
+```
 
-## What technologies are used for this project?
+The build artifacts will be stored in the `dist/` directory.
+
+### Deploying to a Web Server
+
+After building the project, you can deploy the contents of the `dist/` directory to any static file server.
+
+### Using Lovable for Deployment
+
+The easiest way to deploy this project is through Lovable:
+
+1. Open [Lovable](https://lovable.dev/projects)
+2. Navigate to your project
+3. Click on Share -> Publish
+
+## Technologies
 
 This project is built with:
 
@@ -36,13 +60,7 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/0f60d629-ec1e-4345-a2ae-6e3e88d16797) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
+## Custom Domain Setup
 
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
