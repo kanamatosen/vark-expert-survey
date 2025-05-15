@@ -22,6 +22,7 @@ const App = () => (
       <SurveyProvider>
         <Toaster />
         <Sonner />
+        
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<WelcomePage />} />
