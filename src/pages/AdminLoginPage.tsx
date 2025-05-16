@@ -51,45 +51,63 @@ const AdminLoginPage = () => {
         return;
       }
 
-      // If credentials are valid, sign in with Supabase Auth
-      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+      // If credentials are valid, manually set auth session
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
+      // If auth error, manually create account and signin
       if (signInError) {
-        // If the user doesn't exist in Auth yet, sign up first
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        console.log("Sign in error, trying to sign up:", signInError);
+        
+        const { error: signUpError } = await supabase.auth.signUp({
           email,
-          password
+          password,
+          options: {
+            data: {
+              is_admin: true
+            }
+          }
         });
 
         if (signUpError) {
+          console.log("Sign up error:", signUpError);
           toast({
             variant: "destructive",
             title: "Error",
-            description: "Gagal membuat akun admin",
+            description: "Gagal membuat akun admin. " + signUpError.message,
           });
           setIsLoading(false);
           return;
         }
 
-        // Try sign in again
-        await supabase.auth.signInWithPassword({
+        // Try sign in again after signup
+        const { error: retrySignInError } = await supabase.auth.signInWithPassword({
           email,
           password
         });
+
+        if (retrySignInError) {
+          console.log("Retry sign in error:", retrySignInError);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Login gagal setelah pendaftaran. " + retrySignInError.message,
+          });
+          setIsLoading(false);
+          return;
+        }
       }
 
       toast({
         title: "Login berhasil",
         description: "Selamat datang, Admin!",
       });
-
-      // Redirect to admin history page - Force navigation
-      setTimeout(() => {
-        navigate('/admin/history');
-      }, 500);
+      
+      // Use a more reliable navigation method - direct page change
+      window.location.href = '/admin/history';
+      
     } catch (error) {
       console.error('Login error:', error);
       toast({
@@ -97,7 +115,6 @@ const AdminLoginPage = () => {
         title: "Error",
         description: "Terjadi kesalahan saat login",
       });
-    } finally {
       setIsLoading(false);
     }
   };
