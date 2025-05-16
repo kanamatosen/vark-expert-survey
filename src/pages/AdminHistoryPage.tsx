@@ -31,11 +31,18 @@ const AdminHistoryPage = () => {
   useEffect(() => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
+      
       if (!data.session) {
+        toast({
+          variant: "destructive",
+          title: "Akses ditolak",
+          description: "Anda harus login sebagai admin terlebih dahulu",
+        });
         navigate('/admin');
         return;
       }
       
+      // If session exists, fetch results
       fetchResults();
     };
     
@@ -67,12 +74,32 @@ const AdminHistoryPage = () => {
   };
   
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Logout berhasil",
-      description: "Anda telah keluar dari akun admin",
-    });
-    navigate('/');
+    try {
+      // Clean up any auth tokens first
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('supabase.auth') || key.includes('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      // Then sign out
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      toast({
+        title: "Logout berhasil",
+        description: "Anda telah keluar dari akun admin",
+      });
+      
+      // Force a page reload to clear any cached state
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Gagal logout",
+      });
+    }
   };
 
   // Helper function to format learning style name

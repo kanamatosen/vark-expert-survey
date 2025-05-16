@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import SurveyLayout from '@/components/SurveyLayout';
@@ -15,6 +15,18 @@ const AdminLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Check if already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        navigate('/admin/history');
+      }
+    };
+    
+    checkSession();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,18 +47,19 @@ const AdminLoginPage = () => {
           title: "Login gagal",
           description: "Email atau password tidak valid",
         });
+        setIsLoading(false);
         return;
       }
 
       // If credentials are valid, sign in with Supabase Auth
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
       if (signInError) {
         // If the user doesn't exist in Auth yet, sign up first
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
           password
         });
@@ -57,6 +70,7 @@ const AdminLoginPage = () => {
             title: "Error",
             description: "Gagal membuat akun admin",
           });
+          setIsLoading(false);
           return;
         }
 
@@ -72,7 +86,10 @@ const AdminLoginPage = () => {
         description: "Selamat datang, Admin!",
       });
 
-      navigate('/admin/history');
+      // Redirect to admin history page - Force navigation
+      setTimeout(() => {
+        navigate('/admin/history');
+      }, 500);
     } catch (error) {
       console.error('Login error:', error);
       toast({
