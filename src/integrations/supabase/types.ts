@@ -9,7 +9,83 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      admin_credentials: {
+        Row: {
+          email: string
+          id: string
+          password_hash: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          password_hash: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          password_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_credentials_email_fkey"
+            columns: ["email"]
+            isOneToOne: true
+            referencedRelation: "admin_users"
+            referencedColumns: ["email"]
+          },
+        ]
+      }
+      admin_users: {
+        Row: {
+          email: string
+          id: string
+        }
+        Insert: {
+          email: string
+          id?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      survey_results: {
+        Row: {
+          admin_only: boolean
+          auditory_score: number
+          dominant_style: string
+          id: string
+          kinesthetic_score: number
+          name: string
+          nim: string
+          timestamp: string
+          visual_score: number
+        }
+        Insert: {
+          admin_only?: boolean
+          auditory_score: number
+          dominant_style: string
+          id?: string
+          kinesthetic_score: number
+          name: string
+          nim: string
+          timestamp?: string
+          visual_score: number
+        }
+        Update: {
+          admin_only?: boolean
+          auditory_score?: number
+          dominant_style?: string
+          id?: string
+          kinesthetic_score?: number
+          name?: string
+          nim?: string
+          timestamp?: string
+          visual_score?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

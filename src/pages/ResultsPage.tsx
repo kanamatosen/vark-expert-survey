@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Printer, History } from 'lucide-react';
 
 const ResultsPage = () => {
-  const { userData, resetSurvey, addToHistory } = useSurvey();
+  const { userData, resetSurvey, addToHistory, isSubmitting } = useSurvey();
   const navigate = useNavigate();
   const printRef = useRef<HTMLDivElement>(null);
   const historyAddedRef = useRef(false);
@@ -162,6 +162,9 @@ const ResultsPage = () => {
           <p className="text-lg">
             <span className="font-bold">{userData.name}</span> ({userData.nim})
           </p>
+          {isSubmitting && (
+            <p className="text-sm text-gray-500 mt-1">Menyimpan hasil...</p>
+          )}
         </div>
         
         <Card className="border-t-4" style={{ borderTopColor: getBorderColor(userData.dominantStyle) }}>

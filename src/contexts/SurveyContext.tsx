@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { UserData } from '../types/survey';
 import { evaluateResults } from '../utils/expertSystem';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SurveyContextType {
   userData: UserData;
@@ -14,6 +15,7 @@ interface SurveyContextType {
   addToHistory: () => void;
   clearHistory: () => void;
   viewHistoryItem: (index: number) => void;
+  isSubmitting: boolean;
 }
 
 const defaultUserData: UserData = {
@@ -33,6 +35,7 @@ const SurveyContext = createContext<SurveyContextType | undefined>(undefined);
 export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [userData, setUserData] = useState<UserData>(defaultUserData);
   const [surveyHistory, setSurveyHistory] = useState<UserData[]>(loadHistory);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Save history to localStorage whenever it changes
   useEffect(() => {
@@ -66,25 +69,45 @@ export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setUserData(defaultUserData);
   };
 
-  const addToHistory = () => {
+  const addToHistory = async () => {
     // Only add to history if we have results and it's not empty
     if (userData.results && userData.dominantStyle) {
-      // Check if this entry is already in history based on timestamp
-      const existingEntry = surveyHistory.find(entry => 
-        entry.name === userData.name && 
-        entry.nim === userData.nim &&
-        entry.timestamp && 
-        (new Date().getTime() - new Date(entry.timestamp).getTime() < 5000) // Within 5 seconds
-      );
-      
-      if (!existingEntry) {
-        // Add timestamp to the survey result
-        const surveyWithTimestamp = {
-          ...userData,
-          timestamp: new Date().toISOString()
-        };
+      setIsSubmitting(true);
+      try {
+        // Check if this entry is already in history based on timestamp
+        const existingEntry = surveyHistory.find(entry => 
+          entry.name === userData.name && 
+          entry.nim === userData.nim &&
+          entry.timestamp && 
+          (new Date().getTime() - new Date(entry.timestamp).getTime() < 5000) // Within 5 seconds
+        );
         
-        setSurveyHistory(prev => [surveyWithTimestamp, ...prev]);
+        if (!existingEntry) {
+          // Add timestamp to the survey result
+          const surveyWithTimestamp = {
+            ...userData,
+            timestamp: new Date().toISOString()
+          };
+          
+          // Add to local history
+          setSurveyHistory(prev => [surveyWithTimestamp, ...prev]);
+          
+          // Save to Supabase
+          if (userData.results) {
+            await supabase.from('survey_results').insert({
+              name: userData.name,
+              nim: userData.nim,
+              visual_score: userData.results.visual,
+              auditory_score: userData.results.auditory,
+              kinesthetic_score: userData.results.kinesthetic,
+              dominant_style: userData.dominantStyle
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error saving survey result:", error);
+      } finally {
+        setIsSubmitting(false);
       }
     }
   };
@@ -113,7 +136,8 @@ export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         surveyHistory,
         addToHistory,
         clearHistory,
-        viewHistoryItem
+        viewHistoryItem,
+        isSubmitting
       }}
     >
       {children}

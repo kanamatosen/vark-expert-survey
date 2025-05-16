@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useSurvey } from '@/contexts/SurveyContext';
 import SurveyLayout from '@/components/SurveyLayout';
 import { useToast } from "@/components/ui/use-toast";
-import { History } from 'lucide-react';
+import { History, Shield } from 'lucide-react';
 
 const WelcomePage = () => {
   const { userData, setName, setNim, surveyHistory } = useSurvey();
@@ -44,6 +44,10 @@ const WelcomePage = () => {
 
   const handleHistory = () => {
     navigate('/history');
+  };
+  
+  const handleAdminLogin = () => {
+    navigate('/admin');
   };
 
   return (
@@ -102,6 +106,18 @@ const WelcomePage = () => {
             </Button>
           )}
         </form>
+        
+        <div className="mt-8 text-center">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleAdminLogin}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <Shield className="mr-2 h-4 w-4" />
+            Admin Login
+          </Button>
+        </div>
       </div>
     </SurveyLayout>
   );

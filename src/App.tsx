@@ -12,6 +12,8 @@ import AuditoryQuestionsPage from "./pages/AuditoryQuestionsPage";
 import KinestheticQuestionsPage from "./pages/KinestheticQuestionsPage";
 import ResultsPage from "./pages/ResultsPage";
 import HistoryPage from "./pages/HistoryPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import AdminHistoryPage from "./pages/AdminHistoryPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,8 @@ const App = () => (
             <Route path="/survey/kinesthetic" element={<KinestheticQuestionsPage />} />
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/history" element={<HistoryPage />} />
+            <Route path="/admin" element={<AdminLoginPage />} />
+            <Route path="/admin/history" element={<AdminHistoryPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
