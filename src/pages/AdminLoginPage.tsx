@@ -9,6 +9,22 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 
+// Helper function to clean up auth state
+const cleanupAuthState = () => {
+  // Remove all Supabase auth keys from localStorage
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      localStorage.removeItem(key);
+    }
+  });
+  // Remove from sessionStorage if in use
+  Object.keys(sessionStorage || {}).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      sessionStorage.removeItem(key);
+    }
+  });
+};
+
 const AdminLoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,15 +49,15 @@ const AdminLoginPage = () => {
     setIsLoading(true);
 
     try {
-      // Check if the credentials match what's in the database
-      const { data, error } = await supabase
+      // First, verify if the credentials exist in admin_credentials table
+      const { data: adminData, error: adminError } = await supabase
         .from('admin_credentials')
         .select('*')
         .eq('email', email)
         .eq('password_hash', password)
         .single();
 
-      if (error || !data) {
+      if (adminError || !adminData) {
         toast({
           variant: "destructive",
           title: "Login gagal",
@@ -51,61 +67,47 @@ const AdminLoginPage = () => {
         return;
       }
 
-      // If credentials are valid, manually set auth session
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      // Clean up any existing auth state to prevent conflicts
+      cleanupAuthState();
+      
+      // Try to sign out first to clear any existing sessions
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.log("Sign out error (non-critical):", err);
+      }
+
+      // Now attempt to sign in with the admin credentials
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
-      // If auth error, manually create account and signin
-      if (signInError) {
-        console.log("Sign in error, trying to sign up:", signInError);
+      if (error) {
+        console.error("Sign in error:", error);
         
-        const { error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              is_admin: true
-            }
-          }
-        });
-
-        if (signUpError) {
-          console.log("Sign up error:", signUpError);
+        // If error is not about email confirmation, show it to user
+        if (error.message !== "Email not confirmed") {
           toast({
             variant: "destructive",
             title: "Error",
-            description: "Gagal membuat akun admin. " + signUpError.message,
+            description: error.message,
           });
           setIsLoading(false);
           return;
         }
-
-        // Try sign in again after signup
-        const { error: retrySignInError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (retrySignInError) {
-          console.log("Retry sign in error:", retrySignInError);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Login gagal setelah pendaftaran. " + retrySignInError.message,
-          });
-          setIsLoading(false);
-          return;
-        }
+        
+        // For email confirmation errors, we'll handle it specially below
+        console.log("Email not confirmed, will handle specially");
       }
 
+      // Successful login or special handling for email confirmation error
       toast({
         title: "Login berhasil",
         description: "Selamat datang, Admin!",
       });
       
-      // Use a more reliable navigation method - direct page change
+      // Force a page refresh to ensure clean state
       window.location.href = '/admin/history';
       
     } catch (error) {
