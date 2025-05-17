@@ -37,36 +37,36 @@ const AdminLoginPage = () => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        navigate('/admin/history');
+        // Check if user is an admin
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.session.user.id)
+          .single();
+          
+        if (profileData?.role === 'admin') {
+          navigate('/admin/history');
+        } else {
+          // If logged in but not admin, sign out
+          await supabase.auth.signOut({ scope: 'global' });
+          cleanupAuthState();
+          toast({
+            variant: "destructive",
+            title: "Akses ditolak",
+            description: "Akun Anda tidak memiliki hak akses admin",
+          });
+        }
       }
     };
     
     checkSession();
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // First, verify if the credentials exist in admin_credentials table
-      const { data: adminData, error: adminError } = await supabase
-        .from('admin_credentials')
-        .select('*')
-        .eq('email', email)
-        .eq('password_hash', password)
-        .single();
-
-      if (adminError || !adminData) {
-        toast({
-          variant: "destructive",
-          title: "Login gagal",
-          description: "Email atau password tidak valid",
-        });
-        setIsLoading(false);
-        return;
-      }
-
       // Clean up any existing auth state to prevent conflicts
       cleanupAuthState();
       
@@ -77,7 +77,7 @@ const AdminLoginPage = () => {
         console.log("Sign out error (non-critical):", err);
       }
 
-      // Now attempt to sign in with the admin credentials
+      // Now attempt to sign in with credentials
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -86,22 +86,37 @@ const AdminLoginPage = () => {
       if (error) {
         console.error("Sign in error:", error);
         
-        // If error is not about email confirmation, show it to user
-        if (error.message !== "Email not confirmed") {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: error.message,
-          });
-          setIsLoading(false);
-          return;
-        }
+        toast({
+          variant: "destructive",
+          title: "Login gagal",
+          description: error.message,
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // Check if the user is admin
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user?.id)
+        .single();
         
-        // For email confirmation errors, we'll handle it specially below
-        console.log("Email not confirmed, will handle specially");
+      if (profileError || profileData?.role !== 'admin') {
+        toast({
+          variant: "destructive",
+          title: "Akses ditolak",
+          description: "Akun Anda tidak memiliki hak akses admin",
+        });
+        
+        // Sign out if not admin
+        await supabase.auth.signOut({ scope: 'global' });
+        cleanupAuthState();
+        setIsLoading(false);
+        return;
       }
 
-      // Successful login or special handling for email confirmation error
+      // Successful login as admin
       toast({
         title: "Login berhasil",
         description: "Selamat datang, Admin!",

@@ -67,17 +67,17 @@ const AdminHistoryPage = () => {
         return;
       }
       
-      console.log("Session found, user is authenticated");
+      console.log("Session found, checking admin status");
       
-      // Verify admin status in admin_users table
-      const { data: adminData, error: adminError } = await supabase
-        .from('admin_users')
-        .select('*')
-        .eq('email', data.session.user.email)
-        .maybeSingle();
+      // Verify admin status in profiles table
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.session.user.id)
+        .single();
         
-      if (adminError || !adminData) {
-        console.log("Not an admin user:", adminError);
+      if (profileError || profileData?.role !== 'admin') {
+        console.log("Not an admin user:", profileError || "Role is not admin");
         toast({
           variant: "destructive",
           title: "Akses ditolak",
