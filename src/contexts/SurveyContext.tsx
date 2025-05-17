@@ -94,7 +94,7 @@ export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
           
           // Save to Supabase
           if (userData.results) {
-            await supabase.from('survey_results').insert({
+            const { error } = await supabase.from('survey_results').insert({
               name: userData.name,
               nim: userData.nim,
               visual_score: userData.results.visual,
@@ -102,6 +102,10 @@ export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
               kinesthetic_score: userData.results.kinesthetic,
               dominant_style: userData.dominantStyle
             });
+            
+            if (error) {
+              console.error("Error saving to Supabase:", error);
+            }
           }
         }
       } catch (error) {

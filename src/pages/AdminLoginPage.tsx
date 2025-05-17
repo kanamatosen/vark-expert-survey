@@ -38,7 +38,7 @@ const AdminLoginPage = () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         // Check if user is an admin
-        const { data: profileData } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', data.session.user.id)
