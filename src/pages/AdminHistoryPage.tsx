@@ -7,8 +7,8 @@ import SurveyLayout from '@/components/SurveyLayout';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, ArrowLeft } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { LogOut, ArrowLeft, FileText } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 
 interface SurveyResult {
@@ -154,6 +154,10 @@ const AdminHistoryPage = () => {
     }
   };
 
+  const viewResultDetail = (resultId: string) => {
+    navigate(`/admin/result/${resultId}`);
+  };
+
   return (
     <SurveyLayout title="Panel Admin" subtitle="Riwayat Semua Hasil Tes VARK">
       <div className="mb-4 flex justify-between items-center">
@@ -207,6 +211,7 @@ const AdminHistoryPage = () => {
                       <TableHead className="text-right">Visual</TableHead>
                       <TableHead className="text-right">Auditori</TableHead>
                       <TableHead className="text-right">Kinestetik</TableHead>
+                      <TableHead className="text-right">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -223,6 +228,17 @@ const AdminHistoryPage = () => {
                         <TableCell className="text-right">{result.visual_score}</TableCell>
                         <TableCell className="text-right">{result.auditory_score}</TableCell>
                         <TableCell className="text-right">{result.kinesthetic_score}</TableCell>
+                        <TableCell className="text-right">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="flex items-center gap-1"
+                            onClick={() => viewResultDetail(result.id)}
+                          >
+                            <FileText className="h-4 w-4" />
+                            Detail
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

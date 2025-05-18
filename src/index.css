@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -75,4 +74,42 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@media print {
+  body {
+    background-color: white;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Hide non-printable elements */
+  .print-hidden,
+  nav,
+  button:not(.print-include) {
+    display: none !important;
+  }
+  
+  /* Show only when printing */
+  .print-only {
+    display: block !important;
+  }
+  
+  /* Format print sections nicely */
+  .print-section {
+    page-break-inside: avoid;
+    margin-bottom: 20px;
+  }
+  
+  /* Ensure proper sizing */
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+}
+
+/* Hide print-only elements when not printing */
+.print-only {
+  display: none !important;
 }
