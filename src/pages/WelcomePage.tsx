@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -47,7 +46,7 @@ const WelcomePage = () => {
   };
   
   const handleAdminLogin = () => {
-    navigate('/admin');
+    navigate('/admin/login');
   };
 
   return (

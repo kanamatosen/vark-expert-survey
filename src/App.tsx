@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,11 +35,9 @@ function App() {
               <Route path="/survey/kinesthetic" element={<KinestheticQuestionsPage />} />
               <Route path="/results" element={<ResultsPage />} />
               <Route path="/history" element={<HistoryPage />} />
-              <Route path="admin">
-                <Route path="login" element={<AdminLoginPage />} />
-                <Route path="history" element={<AdminHistoryPage />} />
-                <Route path="result/:resultId" element={<ResultDetailPage />} />
-              </Route>
+              <Route path="/admin/login" element={<AdminLoginPage />} />
+              <Route path="/admin/history" element={<AdminHistoryPage />} />
+              <Route path="/admin/result/:resultId" element={<ResultDetailPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
