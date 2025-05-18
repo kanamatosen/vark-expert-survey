@@ -1,67 +1,95 @@
+PANDUAN PENGGUNAAN APLIKASI.txt
+📌 SISTEM PAKAR VARK SURVEY
+Halo! 👋 Terima kasih sudah melihat project ini.
 
-# VARK Learning Style Assessment
+=====================================
+📋 FITUR UTAMA
+=====================================
+- Analisa gaya belajar dengan berbagai macam soal
+- Sistem pakar berbasis forward chaining untuk rekomendasi
+- Tampilan bersih dan responsif
+- Admin panel untuk memudahkan admin mengecek hasil survei mahasiswa
 
-A web application that helps users identify their preferred learning style through an interactive survey based on the VARK (Visual, Auditory, Reading/Writing, Kinesthetic) model.
+=====================================
+🛠️ CARA INSTALL & JALANKAN APLIKASI
+=====================================
 
-## Features
+📥 OPSI 1: JALANKAN SECARA LOKAL
 
-- Interactive VARK style assessment
-- Detailed results with personalized recommendations
-- Survey history tracking
-- Responsive design for all devices
+1. Ekstrak file 7z proyek ini.
+   (Catatan: folder `node_modules` tidak disertakan)
 
-## Development
+2. Buka terminal di dalam folder proyek.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3. Jalankan perintah berikut untuk meng-install dependency:
+   npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+4. Jalankan aplikasi dengan perintah:
+   npm run dev
 
-# Step 3: Install the necessary dependencies.
-npm i
+   Aplikasi akan berjalan di:
+   http://localhost:8080
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+📦 OPSI 2: MELALUI GITHUB
 
-## Deployment
+1. Clone repositori ini dari GitHub:
+   git clone https://github.com/Mrifkiauliap/rupiah-smart-tracker.git
 
-### Building for Production
+2. Masuk ke folder proyek:
+   cd vark-expert-guide
 
-To build the application for production deployment:
+3. Jalankan:
+   npm install
+   npm run dev
 
-```sh
-npm run build
-```
+   Aplikasi akan berjalan di:
+   http://localhost:8080
 
-The build artifacts will be stored in the `dist/` directory.
+🌐 OPSI 3: LIHAT APLIKASI ONLINE (vercel)
 
-### Deploying to a Web Server
+Aplikasi ini juga dapat langsung diakses melalui:
 
-After building the project, you can deploy the contents of the `dist/` directory to any static file server.
+> https://vark-expert-survey-guide.vercel.app/
 
-### Using Lovable for Deployment
+=====================================
+🔐 AKUN ADMIN (UNTUK MELIHAT RIWAYAT PENGERJAAN)
+=====================================
 
-The easiest way to deploy this project is through Lovable:
+📧 Email: vark@admin.com
+🔑 Password: vark2024
 
-1. Open [Lovable](https://lovable.dev/projects)
-2. Navigate to your project
-3. Click on Share -> Publish
+=====================================
+🧠 ANALISA & SISTEM PAKAR
+=====================================
+Untuk melihat rekomendasi dan proses forward chaining:
 
-## Technologies
+📄 File logika dan juga rekomendasi sistem pakar:
+> src\utils\expertSystem.ts
 
-This project is built with:
+=====================================
+❓ MASALAH UMUM
+=====================================
+- Jika `npm install` gagal:
+  - Pastikan sudah meng-install Node.js versi terbaru.
+  - Coba hapus file `package-lock.json` lalu jalankan ulang `npm install`.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Jika aplikasi tidak berjalan setelah `npm run dev`:
+  - Pastikan tidak ada port yang bentrok (default: 8080).
+  - Coba jalankan ulang terminal atau restart komputer.
 
-## Custom Domain Setup
+- Tidak perlu membuat file `.env`, karena semua konfigurasi sudah termasuk dalam kode.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+=====================================
+📬 DIKEMBANGKAN OLEH
+=====================================
+💼 KELOMPOK 6 - Mata Kuliah Sistem Pakar  
+Universitas Samudra - Teknik Informatika
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+1. Wan Anjasmara  (230504095)  
+2. Tarisa Zafira  (230504134)  
+3. Nuzulia Ramadhan (230504111)
+
+GitHub: https://github.com/kanamatosen/vark-expert-survey-guide)
+
+
+Terima kasih sudah mencoba aplikasi ini! 
