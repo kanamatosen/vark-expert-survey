@@ -10,7 +10,7 @@ export interface Question {
 export interface UserData {
   name: string;
   nim: string;
-  answers: Record<number, boolean>;
+  answers?: Record<number, boolean>; // Making answers optional with ?
   results?: Record<LearningStyle, number>;
   dominantStyle?: LearningStyle;
   timestamp?: string;
