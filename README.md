@@ -33,7 +33,7 @@ Halo! 👋 Terima kasih sudah melihat project ini.
 📦 OPSI 2: MELALUI GITHUB
 
 1. Clone repositori ini dari GitHub:
-   git clone https://github.com/Mrifkiauliap/rupiah-smart-tracker.git
+   git clone https://github.com/kanamatosen/vark-expert-survey
 
 2. Masuk ke folder proyek:
    cd vark-expert-guide
