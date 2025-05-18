@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
@@ -8,7 +7,7 @@ import SurveyLayout from '@/components/SurveyLayout';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut } from 'lucide-react';
+import { LogOut, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 
@@ -28,25 +27,14 @@ const AdminHistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const resultsPerPage = 10;
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Immediately check auth status when page loads
     checkAuthAndFetchData();
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) {
-        navigate('/admin');
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     fetchResults();
@@ -56,35 +44,16 @@ const AdminHistoryPage = () => {
     try {
       const { data } = await supabase.auth.getSession();
       
-      if (!data.session) {
-        console.log("No session found, redirecting to login");
-        toast({
-          variant: "destructive",
-          title: "Akses ditolak",
-          description: "Anda harus login sebagai admin terlebih dahulu",
-        });
-        navigate('/admin');
-        return;
-      }
-      
-      console.log("Session found, checking admin status");
-      
-      // Verify admin status in profiles table
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.session.user.id)
-        .single();
-        
-      if (profileError || profileData?.role !== 'admin') {
-        console.log("Not an admin user:", profileError || "Role is not admin");
-        toast({
-          variant: "destructive",
-          title: "Akses ditolak",
-          description: "Anda bukan admin yang terdaftar",
-        });
-        handleLogout();
-        return;
+      if (data.session) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.session.user.id)
+          .single();
+          
+        if (profileData?.role === 'admin') {
+          setIsLoggedIn(true);
+        }
       }
       
       // Get total count for pagination
@@ -96,16 +65,12 @@ const AdminHistoryPage = () => {
         setTotalPages(Math.ceil(count / resultsPerPage));
       }
       
-      // If session exists and is admin, fetch results
+      // Fetch results whether logged in or not
       fetchResults();
     } catch (error) {
       console.error("Auth check error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Gagal memeriksa otentikasi",
-      });
-      navigate('/admin');
+      // Still fetch results regardless of auth error
+      fetchResults();
     }
   };
 
@@ -191,18 +156,33 @@ const AdminHistoryPage = () => {
 
   return (
     <SurveyLayout title="Panel Admin" subtitle="Riwayat Semua Hasil Tes VARK">
+      <div className="mb-4 flex justify-between items-center">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => navigate('/')}
+          className="flex items-center gap-1"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Kembali ke Beranda
+        </Button>
+        
+        {isLoggedIn && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
+        )}
+      </div>
+      
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl flex justify-between items-center">
-            <span>Semua Hasil Tes</span>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
+          <CardTitle className="text-xl">
+            Semua Hasil Tes
           </CardTitle>
         </CardHeader>
         <CardContent>

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
+import { ArrowLeft } from 'lucide-react';
 
 // Helper function to clean up auth state
 const cleanupAuthState = () => {
@@ -138,6 +139,17 @@ const AdminLoginPage = () => {
 
   return (
     <SurveyLayout title="Admin Login" subtitle="Login untuk akses panel admin">
+      <div className="mb-4">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => navigate('/')}
+          className="flex items-center gap-1"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Kembali ke Beranda
+        </Button>
+      </div>
       <div className="flex justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
@@ -180,10 +192,10 @@ const AdminLoginPage = () => {
               <div className="text-center mt-4">
                 <Button 
                   variant="link" 
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/admin/history')}
                   type="button"
                 >
-                  Kembali ke Halaman Utama
+                  Akses Panel Admin Tanpa Login
                 </Button>
               </div>
             </form>

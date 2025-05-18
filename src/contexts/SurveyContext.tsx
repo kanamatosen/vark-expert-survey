@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { UserData } from '../types/survey';
 import { evaluateResults } from '../utils/expertSystem';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 interface SurveyContextType {
   userData: UserData;
@@ -105,6 +106,13 @@ export const SurveyProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             
             if (error) {
               console.error("Error saving to Supabase:", error);
+            } else {
+              // Show success toast message
+              toast({
+                title: "Terima Kasih!",
+                description: "Data Anda aman bersama kami. Hasil tes gaya belajar Anda telah tersimpan.",
+                duration: 5000,
+              });
             }
           }
         }
