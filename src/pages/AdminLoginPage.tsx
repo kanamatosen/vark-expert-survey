@@ -26,6 +26,18 @@ const cleanupAuthState = () => {
   });
 };
 
+// Admin accounts configuration
+const ADMIN_ACCOUNTS = [
+  {
+    email: "admin@example.com",
+    password: "admin123"
+  },
+  {
+    email: "vark@admin.com", 
+    password: "vark2024"
+  }
+];
+
 const AdminLoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -68,6 +80,23 @@ const AdminLoginPage = () => {
     setIsLoading(true);
 
     try {
+      // Check if login matches one of our hardcoded admin accounts
+      const matchedAdmin = ADMIN_ACCOUNTS.find(
+        admin => admin.email === email && admin.password === password
+      );
+
+      if (matchedAdmin) {
+        toast({
+          title: "Login berhasil",
+          description: "Selamat datang, Admin!",
+        });
+        
+        // Navigate to admin history page without actual authentication
+        navigate('/admin/history');
+        return;
+      }
+      
+      // If no hardcoded match, continue with Supabase auth
       // Clean up any existing auth state to prevent conflicts
       cleanupAuthState();
       
